@@ -628,6 +628,9 @@ out:
 =======
 
 #ifdef CONFIG_KNOX_NCM
+<<<<<<< HEAD
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
+=======
 >>>>>>> cce19649a (net: disableable KNOX net implementation)
 // SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
 /** The function sets the domain name associated with the socket. **/
@@ -718,7 +721,11 @@ out:
 
 // SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+#endif
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
 =======
 #endif
 >>>>>>> cce19649a (net: disableable KNOX net implementation)
@@ -774,6 +781,9 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
 =======
 
 #ifdef CONFIG_KNOX_NCM
+<<<<<<< HEAD
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
+=======
 >>>>>>> cce19649a (net: disableable KNOX net implementation)
 	// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
 	if (optname == SO_SET_DOMAIN_NAME)
@@ -784,7 +794,11 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
 		return sock_set_dns_pid(sk, optval, optlen);
 	// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+#endif
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
 =======
 #endif
 >>>>>>> cce19649a (net: disableable KNOX net implementation)
@@ -1641,6 +1655,9 @@ struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
 =======
 
 #ifdef CONFIG_KNOX_NCM
+<<<<<<< HEAD
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
+=======
 >>>>>>> cce19649a (net: disableable KNOX net implementation)
 	// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
 	struct pid *pid_struct = NULL;
@@ -1653,7 +1670,11 @@ struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
 	char full_parent_process_name[PROCESS_NAME_LEN_NAP] = {0};
 	// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+#endif
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
 =======
 #endif
 >>>>>>> cce19649a (net: disableable KNOX net implementation)

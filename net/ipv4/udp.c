@@ -116,7 +116,11 @@
 #include <net/sock_reuseport.h>
 #include <net/addrconf.h>
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include <net/udp_tunnel.h>
+=======
+#ifdef CONFIG_KNOX_NCM
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
 =======
 #ifdef CONFIG_KNOX_NCM
 >>>>>>> cce19649a (net: disableable KNOX net implementation)
@@ -124,6 +128,11 @@
 #include <net/ncm.h>
 // SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA }
 #endif
+<<<<<<< HEAD
+=======
+
+#include <perf_tracker_internal.h>
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
 
 struct udp_table udp_table __read_mostly;
 EXPORT_SYMBOL(udp_table);
@@ -2290,6 +2299,9 @@ int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
 =======
 
 #ifdef CONFIG_KNOX_NCM
+<<<<<<< HEAD
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
+=======
 >>>>>>> cce19649a (net: disableable KNOX net implementation)
 		// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
 		/* function to handle open flows with incoming udp packets */
@@ -2407,7 +2419,10 @@ int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
 		}
 		// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> cce19649a (net: disableable KNOX net implementation)
 #endif
 
 >>>>>>> cce19649a (net: disableable KNOX net implementation)
