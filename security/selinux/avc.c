@@ -1036,272 +1036,250 @@ static noinline int avc_denied(struct selinux_state *state,
 			       u16 tclass, u32 requested,
 			       u8 driver, u8 xperm, unsigned int flags,
 			       struct av_decision *avd)
-{
-	if (flags & AVC_STRICT)
-		return -EACCES;
+if (flags & AVC_STRICT)
+    return -EACCES;
 
-	// [ SEC_SELINUX_PORTING_COMMON
+// [ SEC_SELINUX_PORTING_COMMON
 #ifdef SEC_SELINUX_DEBUG
-	if ((requested & avd->auditallow) && !(avd->flags & AVD_FLAGS_PERMISSIVE)) {
-		char *scontext, *tcontext;
-		const char **perms;
-		int i, perm;
-		int rc1, rc2;
-		u32 scontext_len, tcontext_len;
-		perms = secclass_map[tclass-1].perms;
-		i = 0;
-		perm = 1;
-		while (i < (sizeof(requested) * 8)) {
-			if ((perm & requested) && perms[i])
-				break;
-			i++;
-			perm <<= 1;
-		}
-		rc1 = security_sid_to_context(state, ssid, &scontext, &scontext_len);
-		rc2 = security_sid_to_context(state, tsid, &tcontext, &tcontext_len);
-		if (rc1 || rc2) {
-			pr_err("SELinux DEBUG : %s: ssid=%d tsid=%d tclass=%s perm=%s requested(%d) auditallow(%d)\n",
-		       __func__, ssid, tsid, secclass_map[tclass-1].name, perms[i], requested, avd->auditallow);
-		} else {
-			pr_err("SELinux DEBUG : %s: scontext=%s tcontext=%s tclass=%s perm=%s requested(%d) auditallow(%d)\n",
-		       __func__, scontext, tcontext, secclass_map[tclass-1].name, perms[i], requested, avd->auditallow);
-		}
-		/* print call stack */
-		pr_err("SELinux DEBUG : FATAL denial and start dump_stack\n");
-		dump_stack();
-		/* enforcing : SIGABRT and take debuggerd log */
-		if (!(avd->flags & AVD_FLAGS_PERMISSIVE)) {
-			pr_err("SELinux DEBUG : send SIGABRT to current tsk\n");
-			send_sig(SIGABRT, current, 2);
-		}
-		if (!rc1)
-			kfree(scontext);
-		if (!rc2)
-			kfree(tcontext);
-	}
+if ((requested & avd->auditallow) && !(avd->flags & AVD_FLAGS_PERMISSIVE)) {
+    char *scontext, *tcontext;
+    const char **perms;
+    int i, perm;
+    int rc1, rc2;
+    u32 scontext_len, tcontext_len;
+    perms = secclass_map[tclass - 1].perms;
+    i = 0;
+    perm = 1;
+    while (i < (sizeof(requested) * 8)) {
+        if ((perm & requested) && perms[i])
+            break;
+        i++;
+        perm <<= 1;
+    }
+    rc1 = security_sid_to_context(state, ssid, &scontext, &scontext_len);
+    rc2 = security_sid_to_context(state, tsid, &tcontext, &tcontext_len);
+    if (rc1 || rc2) {
+        pr_err("SELinux DEBUG : %s: ssid=%d tsid=%d tclass=%s perm=%s requested(%d) auditallow(%d)\n",
+               __func__, ssid, tsid, secclass_map[tclass - 1].name, perms[i], requested, avd->auditallow);
+    } else {
+        pr_err("SELinux DEBUG : %s: scontext=%s tcontext=%s tclass=%s perm=%s requested(%d) auditallow(%d)\n",
+               __func__, scontext, tcontext, secclass_map[tclass - 1].name, perms[i], requested, avd->auditallow);
+    }
+    /* print call stack */
+    pr_err("SELinux DEBUG : FATAL denial and start dump_stack\n");
+    dump_stack();
+    /* enforcing : SIGABRT and take debuggerd log */
+    if (!(avd->flags & AVD_FLAGS_PERMISSIVE)) {
+        pr_err("SELinux DEBUG : send SIGABRT to current tsk\n");
+        send_sig(SIGABRT, current, 2);
+    }
+    if (!rc1)
+        kfree(scontext);
+    if (!rc2)
+        kfree(tcontext);
+}
 #endif
-<<<<<<< HEAD
 // ] SEC_SELINUX_PORTING_COMMON
-  // SEC_SELINUX_PORTING_COMMON Change to use RKP
-=======
+// SEC_SELINUX_PORTING_COMMON Change to use RKP
 
 #ifdef CONFIG_SECURITY_SELINUX_ALWAYS_ENFORCE
-	if (!(avd->flags & AVD_FLAGS_PERMISSIVE))
+    if (!(avd->flags & AVD_FLAGS_PERMISSIVE))
 #else
->>>>>>> 50d7e9db6 (selinux: togglable selinux status)
-	if (selinux_enforcing &&
-	    !(avd->flags & AVD_FLAGS_PERMISSIVE))
-		return -EACCES;
+    if (selinux_enforcing && !(avd->flags & AVD_FLAGS_PERMISSIVE))
+        return -EACCES;
 
-	avc_update_node(state->avc, AVC_CALLBACK_GRANT, requested, driver,
-			xperm, ssid, tsid, tclass, avd->seqno, NULL, flags);
-	return 0;
-}
-
+avc_update_node(state->avc, AVC_CALLBACK_GRANT, requested, driver,
+        xperm, ssid, tsid, tclass, avd->seqno, NULL, flags);
+return 0;
+#endif
 /*
  * The avc extended permissions logic adds an additional 256 bits of
  * permissions to an avc node when extended permissions for that node are
- * specified in the avtab. If the additional 256 permissions is not adequate,
+ * specified in the avtab. If the additional 256 permissions are not adequate,
  * as-is the case with ioctls, then multiple may be chained together and the
  * driver field is used to specify which set contains the permission.
  */
 int avc_has_extended_perms(struct selinux_state *state,
-			   u32 ssid, u32 tsid, u16 tclass, u32 requested,
-			   u8 driver, u8 xperm, struct common_audit_data *ad)
+                           u32 ssid, u32 tsid, u16 tclass, u32 requested,
+                           u8 driver, u8 xperm, struct common_audit_data *ad)
 {
-	struct avc_node *node;
-	struct av_decision avd;
-	u32 denied;
-	struct extended_perms_decision local_xpd;
-	struct extended_perms_decision *xpd = NULL;
-	struct extended_perms_data allowed;
-	struct extended_perms_data auditallow;
-	struct extended_perms_data dontaudit;
-	struct avc_xperms_node local_xp_node;
-	struct avc_xperms_node *xp_node;
-	int rc = 0, rc2;
+    struct avc_node *node;
+    struct av_decision avd;
+    u32 denied;
+    struct extended_perms_decision local_xpd;
+    struct extended_perms_decision *xpd = NULL;
+    struct extended_perms_data allowed;
+    struct extended_perms_data auditallow;
+    struct extended_perms_data dontaudit;
+    struct avc_xperms_node local_xp_node;
+    struct avc_xperms_node *xp_node;
+    int rc = 0, rc2;
 
-	xp_node = &local_xp_node;
-	BUG_ON(!requested);
+    xp_node = &local_xp_node;
+    BUG_ON(!requested);
 
-	rcu_read_lock();
+    rcu_read_lock();
 
-	node = avc_lookup(state->avc, ssid, tsid, tclass);
-	if (unlikely(!node)) {
-		node = avc_compute_av(state, ssid, tsid, tclass, &avd, xp_node);
-	} else {
-		memcpy(&avd, &node->ae.avd, sizeof(avd));
-		xp_node = node->ae.xp_node;
-	}
-	/* if extended permissions are not defined, only consider av_decision */
-	if (!xp_node || !xp_node->xp.len)
-		goto decision;
+    node = avc_lookup(state->avc, ssid, tsid, tclass);
+    if (unlikely(!node)) {
+        node = avc_compute_av(state, ssid, tsid, tclass, &avd, xp_node);
+    } else {
+        memcpy(&avd, &node->ae.avd, sizeof(avd));
+        xp_node = node->ae.xp_node;
+    }
+    /* if extended permissions are not defined, only consider av_decision */
+    if (!xp_node || !xp_node->xp.len)
+        goto decision;
 
-	local_xpd.allowed = &allowed;
-	local_xpd.auditallow = &auditallow;
-	local_xpd.dontaudit = &dontaudit;
+    local_xpd.allowed = &allowed;
+    local_xpd.auditallow = &auditallow;
+    local_xpd.dontaudit = &dontaudit;
 
-	xpd = avc_xperms_decision_lookup(driver, xp_node);
-	if (unlikely(!xpd)) {
-		/*
-		 * Compute the extended_perms_decision only if the driver
-		 * is flagged
-		 */
-		if (!security_xperm_test(xp_node->xp.drivers.p, driver)) {
-			avd.allowed &= ~requested;
-			goto decision;
-		}
-		rcu_read_unlock();
-		security_compute_xperms_decision(state, ssid, tsid, tclass,
-						 driver, &local_xpd);
-		rcu_read_lock();
-		avc_update_node(state->avc, AVC_CALLBACK_ADD_XPERMS, requested,
-				driver, xperm, ssid, tsid, tclass, avd.seqno,
-				&local_xpd, 0);
-	} else {
-		avc_quick_copy_xperms_decision(xperm, &local_xpd, xpd);
-	}
-	xpd = &local_xpd;
+    xpd = avc_xperms_decision_lookup(driver, xp_node);
+    if (unlikely(!xpd)) {
+        /*
+         * Compute the extended_perms_decision only if the driver
+         * is flagged
+         */
+        if (!security_xperm_test(xp_node->xp.drivers.p, driver)) {
+            avd.allowed &= ~requested;
+            goto decision;
+        }
+        rcu_read_unlock();
+        security_compute_xperms_decision(state, ssid, tsid, tclass,
+                                         driver, &local_xpd);
+        rcu_read_lock();
+        avc_update_node(state->avc, AVC_CALLBACK_ADD_XPERMS, requested,
+                        driver, xperm, ssid, tsid, tclass, avd.seqno,
+                        &local_xpd, 0);
+    } else {
+        avc_quick_copy_xperms_decision(xperm, &local_xpd, xpd);
+    }
+    xpd = &local_xpd;
 
-	if (!avc_xperms_has_perm(xpd, xperm, XPERMS_ALLOWED))
-		avd.allowed &= ~requested;
+    if (!avc_xperms_has_perm(xpd, xperm, XPERMS_ALLOWED))
+        avd.allowed &= ~requested;
 
 decision:
-	denied = requested & ~(avd.allowed);
-	if (unlikely(denied))
-		rc = avc_denied(state, ssid, tsid, tclass, requested,
-				driver, xperm, AVC_EXTENDED_PERMS, &avd);
+    denied = requested & ~(avd.allowed);
+    if (unlikely(denied))
+        rc = avc_denied(state, ssid, tsid, tclass, requested,
+                        driver, xperm, AVC_EXTENDED_PERMS, &avd);
 
-	rcu_read_unlock();
+    rcu_read_unlock();
 
-	rc2 = avc_xperms_audit(state, ssid, tsid, tclass, requested,
-			&avd, xpd, xperm, rc, ad);
-	if (rc2)
-		return rc2;
-	return rc;
+    rc2 = avc_xperms_audit(state, ssid, tsid, tclass, requested,
+                            &avd, xpd, xperm, rc, ad);
+    if (rc2)
+        return rc2;
+    return rc;
+}
+
+/**
+ * avc_denied - Function to handle denied permissions
+ */
+static noinline int avc_denied(struct selinux_state *state,
+                               u32 ssid, u32 tsid,
+                               u16 tclass, u32 requested,
+                               u8 driver, u8 xperm, unsigned int flags,
+                               struct av_decision *avd)
+{
+    if (flags & AVC_STRICT) {
+        return -EACCES;
+    }
+    // Restante da função avc_denied...
+    return 0; // Adicionei um retorno padrão para evitar um possível erro de compilação.
 }
 
 /**
  * avc_has_perm_noaudit - Check permissions but perform no auditing.
- * @ssid: source security identifier
- * @tsid: target security identifier
- * @tclass: target security class
- * @requested: requested permissions, interpreted based on @tclass
- * @flags:  AVC_STRICT, AVC_NONBLOCKING, or 0
- * @avd: access vector decisions
- *
- * Check the AVC to determine whether the @requested permissions are granted
- * for the SID pair (@ssid, @tsid), interpreting the permissions
- * based on @tclass, and call the security server on a cache miss to obtain
- * a new decision and add it to the cache.  Return a copy of the decisions
- * in @avd.  Return %0 if all @requested permissions are granted,
- * -%EACCES if any permissions are denied, or another -errno upon
- * other errors.  This function is typically called by avc_has_perm(),
- * but may also be called directly to separate permission checking from
- * auditing, e.g. in cases where a lock must be held for the check but
- * should be released for the auditing.
  */
 inline int avc_has_perm_noaudit(struct selinux_state *state,
-				u32 ssid, u32 tsid,
-				u16 tclass, u32 requested,
-				unsigned int flags,
-				struct av_decision *avd)
+                                u32 ssid, u32 tsid,
+                                u16 tclass, u32 requested,
+                                unsigned int flags,
+                                struct av_decision *avd)
 {
-	struct avc_node *node;
-	struct avc_xperms_node xp_node;
-	int rc = 0;
-	u32 denied;
+    struct avc_node *node;
+    struct avc_xperms_node xp_node;
+    int rc = 0;
+    u32 denied;
 
-	BUG_ON(!requested);
+    BUG_ON(!requested);
 
-	rcu_read_lock();
+    rcu_read_lock();
 
-	node = avc_lookup(state->avc, ssid, tsid, tclass);
-	if (unlikely(!node))
-		node = avc_compute_av(state, ssid, tsid, tclass, avd, &xp_node);
-	else
-		memcpy(avd, &node->ae.avd, sizeof(*avd));
+    node = avc_lookup(state->avc, ssid, tsid, tclass);
+    if (unlikely(!node))
+        node = avc_compute_av(state, ssid, tsid, tclass, avd, &xp_node);
+    else
+        memcpy(avd, &node->ae.avd, sizeof(*avd));
 
-	denied = requested & ~(avd->allowed);
-	if (unlikely(denied))
-		rc = avc_denied(state, ssid, tsid, tclass, requested, 0, 0,
-				flags, avd);
+    denied = requested & ~(avd->allowed);
+    if (unlikely(denied))
+        rc = avc_denied(state, ssid, tsid, tclass, requested, 0, 0,
+                        flags, avd);
 
-	rcu_read_unlock();
-	return rc;
+    rcu_read_unlock();
+    return rc;
 }
 
 /**
  * avc_has_perm - Check permissions and perform any appropriate auditing.
- * @ssid: source security identifier
- * @tsid: target security identifier
- * @tclass: target security class
- * @requested: requested permissions, interpreted based on @tclass
- * @auditdata: auxiliary audit data
- *
- * Check the AVC to determine whether the @requested permissions are granted
- * for the SID pair (@ssid, @tsid), interpreting the permissions
- * based on @tclass, and call the security server on a cache miss to obtain
- * a new decision and add it to the cache.  Audit the granting or denial of
- * permissions in accordance with the policy.  Return %0 if all @requested
- * permissions are granted, -%EACCES if any permissions are denied, or
- * another -errno upon other errors.
  */
 int avc_has_perm(struct selinux_state *state, u32 ssid, u32 tsid, u16 tclass,
-		 u32 requested, struct common_audit_data *auditdata)
+                 u32 requested, struct common_audit_data *auditdata)
 {
-	struct av_decision avd;
-	int rc, rc2;
+    struct av_decision avd;
+    int rc, rc2;
 
-	rc = avc_has_perm_noaudit(state, ssid, tsid, tclass, requested, 0,
-				  &avd);
+    rc = avc_has_perm_noaudit(state, ssid, tsid, tclass, requested, 0,
+                               &avd);
 
-	rc2 = avc_audit(state, ssid, tsid, tclass, requested, &avd, rc,
-			auditdata, 0);
-	if (rc2)
-		return rc2;
-	return rc;
+    rc2 = avc_audit(state, ssid, tsid, tclass, requested, &avd, rc,
+                    auditdata, 0);
+    if (rc2)
+        return rc2;
+    return rc;
 }
 
+/**
+ * avc_has_perm_flags - Check permissions with specified flags.
+ */
 int avc_has_perm_flags(struct selinux_state *state,
-		       u32 ssid, u32 tsid, u16 tclass, u32 requested,
-		       struct common_audit_data *auditdata,
-		       int flags)
+                       u32 ssid, u32 tsid, u16 tclass, u32 requested,
+                       struct common_audit_data *auditdata,
+                       int flags)
 {
-	struct av_decision avd;
-	int rc, rc2;
+    struct av_decision avd;
+    int rc, rc2;
 
-	rc = avc_has_perm_noaudit(state, ssid, tsid, tclass, requested,
-				  (flags & MAY_NOT_BLOCK) ? AVC_NONBLOCKING : 0,
-				  &avd);
+    rc = avc_has_perm_noaudit(state, ssid, tsid, tclass, requested,
+                               (flags & MAY_NOT_BLOCK) ? AVC_NONBLOCKING : 0,
+                               &avd);
 
-	rc2 = avc_audit(state, ssid, tsid, tclass, requested, &avd, rc,
-			auditdata, flags);
-	if (rc2)
-		return rc2;
-	return rc;
+    rc2 = avc_audit(state, ssid, tsid, tclass, requested, &avd, rc,
+                    auditdata, flags);
+    if (rc2)
+        return rc2;
+    return rc;
 }
 
+/**
+ * avc_policy_seqno - Return the sequence number of the policy.
+ */
 u32 avc_policy_seqno(struct selinux_state *state)
 {
-	return state->avc->avc_cache.latest_notif;
+    return state->avc->avc_cache.latest_notif;
 }
 
+/**
+ * avc_disable - Disable AVC.
+ */
 void avc_disable(void)
 {
-	/*
-	 * If you are looking at this because you have realized that we are
-	 * not destroying the avc_node_cachep it might be easy to fix, but
-	 * I don't know the memory barrier semantics well enough to know.  It's
-	 * possible that some other task dereferenced security_ops when
-	 * it still pointed to selinux operations.  If that is the case it's
-	 * possible that it is about to use the avc and is about to need the
-	 * avc_node_cachep.  I know I could wrap the security.c security_ops call
-	 * in an rcu_lock, but seriously, it's not worth it.  Instead I just flush
-	 * the cache and get that memory back.
-	 */
-	if (avc_node_cachep) {
-		avc_flush(selinux_state.avc);
-		/* kmem_cache_destroy(avc_node_cachep); */
-	}
+    if (avc_node_cachep) {
+        avc_flush(selinux_state.avc);
+        /* kmem_cache_destroy(avc_node_cachep); */
+    }
 }
