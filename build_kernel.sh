@@ -2,7 +2,7 @@
 
 
 
-export PATH=$PATH:$(pwd)/../Compiler/ZyC_Clang_18/bin
+export PATH=$PATH:/home/xddeath69/c/bin
 export CC=clang
 export CLANG_TRIPLE=aarch64-linux-gnu-
 export CROSS_COMPILE=aarch64-linux-gnu-
@@ -21,7 +21,7 @@ start_time=$(date +%Y.%m.%d-%I-%M)
 
 start_time_sum=$(date +%s)
 
-make ARCH=arm64 O=out CC=clang a34x_stock_mod
+make ARCH=arm64 O=out CC=clang a34x_defconfig
 
 make ARCH=arm64 O=out CC=clang -j$(nproc) 2>&1 | tee kernel_log-${start_time}.txt
 
@@ -49,9 +49,7 @@ if [ -f out/arch/arm64/boot/Image.gz ]; then
 	echo " "
 	echo "***ta feito essa porra...***"
 	echo " "
-	exit 0
 else
 	echo " "
 	echo "***deu merda!***"
-	exit 0
 fi
