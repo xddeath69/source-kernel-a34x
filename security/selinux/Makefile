@@ -4,9 +4,6 @@
 #
 
 ccflags-y := -I$(srctree)/security/selinux -I$(srctree)/security/selinux/include
-<<<<<<< HEAD
-
-=======
 >>>>>>> 133e3f669 (selinux: remove debug and enforce flag)
 
 obj-$(CONFIG_SECURITY_SELINUX) := selinux.o
