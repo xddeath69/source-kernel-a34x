@@ -55,43 +55,12 @@
 #include <net/netfilter/nf_nat_core.h>
 #include <net/netfilter/nf_nat_helper.h>
 #include <net/netns/hash.h>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-#include <net/ip.h>
-
-#include "nf_internals.h"
-=======
-#ifdef CONFIG_KNOX_NCM
->>>>>>> cce19649a (net: disableable KNOX net implementation)
-=======
-#ifdef CONFIG_KNOX_NCM
->>>>>>> cce19649a (net: disableable KNOX net implementation)
-// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
-#include <net/ncm.h>
-// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA }
-#endif
-<<<<<<< HEAD
-=======
-
-
-#include "nf_internals.h"
-
-#define NF_CONNTRACK_VERSION	"0.5.0"
-
-int (*nfnetlink_parse_nat_setup_hook)(struct nf_conn *ct,
-				      enum nf_nat_manip_type manip,
-				      const struct nlattr *attr) __read_mostly;
-EXPORT_SYMBOL_GPL(nfnetlink_parse_nat_setup_hook);
->>>>>>> cce19649a (net: disableable KNOX net implementation)
-=======
 #include <net/ip.h>
 
 #include "nf_internals.h"
 // SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
 #include <net/ncm.h>
 // SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA }
->>>>>>> parent of a99756568 (net: disableable KNOX net implementation)
 
 __cacheline_aligned_in_smp spinlock_t nf_conntrack_locks[CONNTRACK_LOCKS];
 EXPORT_SYMBOL_GPL(nf_conntrack_locks);
@@ -508,17 +477,6 @@ clean_from_lists(struct nf_conn *ct)
 static void nf_ct_add_to_dying_list(struct nf_conn *ct)
 {
 	struct ct_pcpu *pcpu;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-#ifdef CONFIG_KNOX_NCM
-<<<<<<< HEAD
->>>>>>> cce19649a (net: disableable KNOX net implementation)
-=======
->>>>>>> cce19649a (net: disableable KNOX net implementation)
-=======
->>>>>>> parent of a99756568 (net: disableable KNOX net implementation)
 	// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
 	/* Add 'del_timer(&ct->npa_timeout)' if struct nf_conn->timeout is of type struct timer_list; */
 	/* send dying conntrack entry to collect data */
@@ -1419,17 +1377,6 @@ __nf_conntrack_alloc(struct net *net,
 		goto out;
 
 	spin_lock_init(&ct->lock);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-#ifdef CONFIG_KNOX_NCM
-<<<<<<< HEAD
->>>>>>> cce19649a (net: disableable KNOX net implementation)
-=======
->>>>>>> cce19649a (net: disableable KNOX net implementation)
-=======
->>>>>>> parent of a99756568 (net: disableable KNOX net implementation)
 	// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
 	/* initialize the conntrack structure members when memory is allocated */
 	if (ct != NULL) {
@@ -1452,17 +1399,6 @@ __nf_conntrack_alloc(struct net *net,
 		atomic_set(&ct->intermediateFlow, 0);
 	}
 	// SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> cce19649a (net: disableable KNOX net implementation)
-#endif
-
->>>>>>> cce19649a (net: disableable KNOX net implementation)
-=======
->>>>>>> parent of a99756568 (net: disableable KNOX net implementation)
 	ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple = *orig;
 	ct->tuplehash[IP_CT_DIR_ORIGINAL].hnnode.pprev = NULL;
 	ct->tuplehash[IP_CT_DIR_REPLY].tuple = *repl;
